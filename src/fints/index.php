@@ -1,46 +1,51 @@
 <?php
 
+/** @noinspection PhpUnhandledExceptionInspection */
+
 /**
  * SAMPLE - Displays the statement of account for a specific time range and account.
  */
 
+// See login.php, it returns a FinTs instance that is already logged in.
+/** @var \Fhp\FinTs $fints */
+$fints = require_once 'Samples/login.php';
 
-require 'vendor/autoload.php';
+// Just pick the first account, for demonstration purposes. You could also have the user choose, or have SEPAAccount
+// hard-coded and not call getSEPAAccounts() at all.
+$getSepaAccounts = \Fhp\Action\GetSEPAAccounts::create();
+$fints->execute($getSepaAccounts);
+if ($getSepaAccounts->needsTan()) {
+    handleTan($getSepaAccounts); // See login.php for the implementation.
+}
+$oneAccount = $getSepaAccounts->getAccounts()[0];
 
-use Fhp\FinTs;
-use Fhp\Model\StatementOfAccount\Statement;
-use Fhp\Model\StatementOfAccount\Transaction;
+$from = (new \DateTime())->sub(new DateInterval('P30D'));;
+$to = new \DateTime();
+$getStatement = \Fhp\Action\GetStatementOfAccount::create($oneAccount, $from, $to);
+$fints->execute($getStatement);
+if ($getStatement->needsTan()) {
+    handleTan($getStatement); // See login.php for the implementation.
+}
 
-define('FHP_BANK_URL', getenv('FINTEX_BANK_URL'));                # HBCI / FinTS Url can be found here: https://www.hbci-zka.de/institute/institut_auswahl.htm (use the PIN/TAN URL)
-define('FHP_BANK_PORT', 443);              # HBCI / FinTS Port can be found here: https://www.hbci-zka.de/institute/institut_auswahl.htm
-define('FHP_BANK_CODE', getenv('FINTEX_BANK_CODE'));               # Your bank code / Bankleitzahl
-define('FHP_ONLINE_BANKING_USERNAME', getenv('FINTEX_BANK_USERNAME')); # Your online banking username / alias
-define('FHP_ONLINE_BANKING_PIN', getenv('FINTEX_BANK_PIN'));      # Your online banking PIN (NOT! the pin of your bank card!)
-
-$fints = new FinTs(
-    FHP_BANK_URL,
-    FHP_BANK_PORT,
-    FHP_BANK_CODE,
-    FHP_ONLINE_BANKING_USERNAME,
-    FHP_ONLINE_BANKING_PIN
-);
-
-$accounts = $fints->getSEPAAccounts();
-
-$oneAccount = $accounts[0];
-$from = new \DateTime('2016-01-01');
-$to   = new \DateTime();
-$soa = $fints->getStatementOfAccount($oneAccount, $from, $to);
+$soa = $getStatement->getStatement();
 $alltransactions = array();
-
+$statementnumber = 0;
 foreach ($soa->getStatements() as $statement) {
     foreach ($statement->getTransactions() as $transaction) {
+        $statementnumber++;
+        $date = $transaction->getValutaDate()->format('Ymd'); # getBookingDate lieferte schon einmal das falsche Jahr, lieber valutadate
+		if (!isset($dateCounters[$date])) {
+			$dateCounters[$date] = 0;
+        }
+        $dateCounters[$date]++;
+        $uniqId = $date.sprintf('%05d', $statementnumber).sprintf('%05d', $dateCounters[$date]);
         $arr = array(
-          "Amount" => ($transaction->getCreditDebit() == Transaction::CD_DEBIT ? '-' : '') . $transaction->getAmount(),
-          "Name" => $transaction->getName(),
-          "Description" => $transaction->getDescription1(),
-          "IBAN" => $transaction->getAccountNumber(),
-          "Date" => $transaction->getBookingDate()->format('d-m-Y')
+            "TXID" => $uniqId,
+            "Amount" => ($transaction->getCreditDebit() == \Fhp\Model\StatementOfAccount\Transaction::CD_DEBIT ? '-' : '') . $transaction->getAmount(),
+            "Name" => $transaction->getName(),
+            "Description" => $transaction->getMainDescription(),
+            "IBAN" => $transaction->getAccountNumber(),
+            "Date" => $transaction->getBookingDate()->format('d-m-Y')
         );
         array_push($alltransactions, $arr);
     }
