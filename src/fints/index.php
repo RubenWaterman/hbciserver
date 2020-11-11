@@ -40,12 +40,12 @@ foreach ($soa->getStatements() as $statement) {
         $dateCounters[$date]++;
         $uniqId = $date.sprintf('%05d', $statementnumber).sprintf('%05d', $dateCounters[$date]);
         $arr = array(
-            "TXID" => $uniqId,
-            "Amount" => ($transaction->getCreditDebit() == \Fhp\Model\StatementOfAccount\Transaction::CD_DEBIT ? '-' : '') . $transaction->getAmount(),
-            "Name" => $transaction->getName(),
-            "Description" => $transaction->getMainDescription(),
-            "IBAN" => $transaction->getAccountNumber(),
-            "Date" => $transaction->getBookingDate()->format('d-m-Y')
+            "txn" => $uniqId,
+            "amount" => ($transaction->getCreditDebit() == \Fhp\Model\StatementOfAccount\Transaction::CD_DEBIT ? '-' : '') . $transaction->getAmount(),
+            "name" => $transaction->getName(),
+            "purpose" => $transaction->getMainDescription(),
+            "account_number" => $transaction->getAccountNumber(),
+            "date" => $transaction->getBookingDate()->format('d-m-Y')
         );
         array_push($alltransactions, $arr);
     }
