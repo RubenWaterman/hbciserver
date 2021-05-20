@@ -19,7 +19,7 @@ if ($getSepaAccounts->needsTan()) {
 }
 $oneAccount = $getSepaAccounts->getAccounts()[0];
 
-$from = (new \DateTime())->sub(new DateInterval('P30D'));;
+$from = (new \DateTime())->sub(new DateInterval('P1D'));;
 $to = new \DateTime();
 $getStatement = \Fhp\Action\GetStatementOfAccount::create($oneAccount, $from, $to);
 $fints->execute($getStatement);
