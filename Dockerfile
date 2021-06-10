@@ -1,4 +1,4 @@
-FROM php:7.2-apache
+FROM php:7.3-apache
 LABEL maintainer="Cosmin Harangus <cosmin@around25.com>"
 
 WORKDIR /var/www/html/

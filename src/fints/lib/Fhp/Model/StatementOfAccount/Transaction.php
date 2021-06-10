@@ -1,4 +1,5 @@
-<?php /** @noinspection PhpUnused */
+<?php
+/** @noinspection PhpUnused */
 
 namespace Fhp\Model\StatementOfAccount;
 
@@ -26,6 +27,11 @@ class Transaction
      * @var string
      */
     protected $creditDebit;
+
+    /**
+     * @var bool
+     */
+    protected $isStorno;
 
     /**
      * @var string
@@ -77,6 +83,11 @@ class Transaction
      * @var int
      */
     protected $pn;
+
+    /**
+     * @var int
+     */
+    protected $textKeyAddition;
 
     /**
      * Get booking date.
@@ -177,6 +188,26 @@ class Transaction
     public function setCreditDebit(string $creditDebit)
     {
         $this->creditDebit = $creditDebit;
+
+        return $this;
+    }
+
+    /**
+     * Get isStorno
+     */
+    public function isStorno(): bool
+    {
+        return $this->isStorno;
+    }
+
+    /**
+     * Set isStorno
+     *
+     * @return $this
+     */
+    public function setIsStorno(bool $isStorno)
+    {
+        $this->isStorno = $isStorno;
 
         return $this;
     }
@@ -394,6 +425,26 @@ class Transaction
     public function setPN($nr)
     {
         $this->pn = intval($nr);
+        return $this;
+    }
+
+    /**
+     * Get text key addition
+     */
+    public function getTextKeyAddition(): int
+    {
+        return $this->textKeyAddition;
+    }
+
+    /**
+     * Set text key addition
+     *
+     * @param int|mixed $textKeyAddition Will be parsed to an int.
+     * @return $this
+     */
+    public function setTextKeyAddition($textKeyAddition)
+    {
+        $this->textKeyAddition = intval($textKeyAddition);
         return $this;
     }
 }

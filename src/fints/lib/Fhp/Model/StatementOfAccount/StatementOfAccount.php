@@ -97,6 +97,7 @@ class StatementOfAccount
                     $transaction->setBookingDate(static::parseDate($trx['booking_date']));
                     $transaction->setValutaDate(static::parseDate($trx['valuta_date']));
                     $transaction->setCreditDebit($trx['credit_debit']);
+                    $transaction->setIsStorno($trx['is_storno']);
                     $transaction->setAmount($trx['amount']);
                     $transaction->setBookingCode($trx['description']['booking_code']);
                     $transaction->setBookingText($trx['description']['booking_text']);
@@ -108,6 +109,7 @@ class StatementOfAccount
                     $transaction->setName($trx['description']['name']);
                     $transaction->setBooked($trx['booked']);
                     $transaction->setPN($trx['description']['primanoten_nr']);
+                    $transaction->setTextKeyAddition($trx['description']['text_key_addition']);
                     $statementModel->addTransaction($transaction);
                 }
             }
