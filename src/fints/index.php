@@ -34,11 +34,7 @@ foreach ($soa->getStatements() as $statement) {
     foreach ($statement->getTransactions() as $transaction) {
         $statementnumber++;
         $date = $transaction->getValutaDate()->format('Ymd'); # getBookingDate lieferte schon einmal das falsche Jahr, lieber valutadate
-		if (!isset($dateCounters[$date])) {
-			$dateCounters[$date] = 0;
-        }
-        $dateCounters[$date]++;
-        $uniqId = $date.sprintf('%05d', $statementnumber).sprintf('%05d', $dateCounters[$date]);
+        $uniqId = $date.sprintf('%05d', $statementnumber);
         $arr = array(
             "txn" => $uniqId,
             "amount" => ($transaction->getCreditDebit() == \Fhp\Model\StatementOfAccount\Transaction::CD_DEBIT ? '-' : '') . $transaction->getAmount(),
